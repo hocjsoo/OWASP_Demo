@@ -1,0 +1,358 @@
+@{
+    ViewData["Title"] = "Thực Nghiệm SQL Injection (OWASP A03:2021)";
+}
+
+<div class="row mb-4">
+    <div class="col-12 text-center">
+        <span class="badge bg-danger px-3 py-2 fs-6 mb-2">OWASP Top 10 - A03:2021 (Injection)</span>
+        <h2 class="fw-bold text-dark">THỰC NGHIỆM TẤN CÔNG & PHÒNG THỦ: SQL INJECTION</h2>
+        <p class="text-secondary mb-1">
+            <strong>Học phần:</strong> Lập trình Web nâng cao &bull; <strong>GVHD:</strong> ThS. Lê Hữu Dũng
+        </p>
+        <p class="text-muted small">
+            <strong>Nhóm thực hiện (WNC.G01):</strong> Nguyễn Danh Học (23A1001D0158) - Nguyễn Thanh Bình - Nguyễn Minh Cường
+        </p>
+    </div>
+</div>
+
+<!-- PAYLOAD TOOLBAR (Bấm 1 click để điền vào form) -->
+<div class="card shadow-sm border-0 mb-4 bg-white">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <span class="fw-bold">⚡ Thanh Công Cụ Payload Thực Nghiệm (Bấm để nạp kịch bản tấn công)</span>
+        <button class="btn btn-outline-warning btn-sm" onclick="resetDatabase()">🔄 Reset CSDL Về Gốc</button>
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-danger btn-sm" onclick="applyPayload(`' OR '1'='1' --`, 'anything')">
+                🔥 Payload 1: Bypass Đăng Nhập (<code>' OR '1'='1' --</code>)
+            </button>
+            <button class="btn btn-outline-danger btn-sm" onclick="applyPayload(`admin' --`, 'anything')">
+                👑 Payload 2: Chiếm Quyền Admin (<code>admin' --</code>)
+            </button>
+            <button class="btn btn-outline-danger btn-sm" onclick="applyPayload(`' OR 1=1 --`, 'anything')">
+                📂 Payload 3: Rút Toàn Bộ Tài Khoản (<code>' OR 1=1 --</code>)
+            </button>
+            <button class="btn btn-outline-success btn-sm" onclick="applyPayload('admin', 'AdminPassword@@2026')">
+                🔑 Kịch Bản Bình Thường: Nhập Đúng (<code>admin / AdminPassword@@2026</code>)
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="clearForms()">
+                🧹 Xóa Trắng Ô Nhập
+            </button>
+        </div>
+        <div class="mt-2 text-muted small">
+            * Nhấn một nút bất kỳ ở trên để tự động điền payload vào cả 2 bên (Bị Lỗi vs Đã Vá) nhằm so sánh đối chứng trực tiếp.
+        </div>
+    </div>
+</div>
+
+<!-- SO SÁNH 2 CỘT: VULNERABLE VS SECURE -->
+<div class="row g-4">
+    <!-- CỘT 1: HỆ THỐNG DÍNH LỖI (VULNERABLE) -->
+    <div class="col-lg-6">
+        <div class="card border-danger shadow-sm h-100">
+            <div class="card-header bg-danger text-white py-3">
+                <h5 class="card-title mb-0 fw-bold">❌ 1. NHÁNH BỊ LỖI (Ghép Chuỗi SQL Thuần)</h5>
+                <small class="opacity-75">Sử dụng chuỗi cộng trực tiếp: $"SELECT ... '{user}' AND '{pass}'"</small>
+            </div>
+            <div class="card-body">
+                <form id="formVulnerable" onsubmit="submitVulnerable(event)">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên đăng nhập (Username):</label>
+                        <input type="text" id="vulnUsername" class="form-control font-monospace border-danger" placeholder="Nhập username hoặc payload..." required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mật khẩu (Password):</label>
+                        <input type="text" id="vulnPassword" class="form-control font-monospace border-danger" placeholder="Nhập mật khẩu..." />
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100 fw-bold py-2">
+                        🚀 Gửi Request Khai Thác (Vulnerable Action)
+                    </button>
+                </form>
+
+                <!-- KHUNG DEBUG SQL (MINH CHỨNG THỰC TẾ) -->
+                <div class="mt-4">
+                    <label class="fw-bold text-danger small text-uppercase">CÂU TRUY VẤN SQL THỰC THI TRÊN SERVER:</label>
+                    <div id="vulnSqlBox" class="p-3 bg-dark text-warning font-monospace rounded small" style="min-height: 60px; word-break: break-all;">
+                        (Chưa có truy vấn nào được thực thi)
+                    </div>
+                </div>
+
+                <!-- KHUNG PHÂN TÍCH HẬU QUẢ -->
+                <div class="mt-3">
+                    <label class="fw-bold small text-uppercase">KẾT QUẢ & PHÂN TÍCH AN NINH:</label>
+                    <div id="vulnAnalysisBox" class="alert alert-secondary mb-0 small">
+                        Vui lòng nhập thông tin hoặc chọn payload mẫu ở trên rồi bấm gửi.
+                    </div>
+                </div>
+
+                <!-- DỮ LIỆU BỊ ĐÁNH CẮP / RÒ RỈ -->
+                <div class="mt-3" id="vulnResultArea" style="display: none;">
+                    <label class="fw-bold text-danger small text-uppercase">DỮ LIỆU ĐÃ BỊ KẺ TẤN CÔNG TRÍCH XUẤT (RÒ RỈ CSDL):</label>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered table-striped align-middle small">
+                            <thead class="table-danger">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Password (Plain)</th>
+                                    <th>Họ Tên</th>
+                                    <th>Vai Trò</th>
+                                    <th>Số Dư</th>
+                                    <th>Thông Tin Nhạy Cảm</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vulnTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CỘT 2: HỆ THỐNG AN TOÀN (SECURE) -->
+    <div class="col-lg-6">
+        <div class="card border-success shadow-sm h-100">
+            <div class="card-header bg-success text-white py-3">
+                <h5 class="card-title mb-0 fw-bold">✅ 2. NHÁNH ĐÃ VÁ (EF Core Parameterized LINQ)</h5>
+                <small class="opacity-75">Sử dụng tham số hóa: _context.Accounts.Where(a => a.Username == user)</small>
+            </div>
+            <div class="card-body">
+                <form id="formSecure" onsubmit="submitSecure(event)">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên đăng nhập (Username):</label>
+                        <input type="text" id="secUsername" class="form-control font-monospace border-success" placeholder="Nhập username hoặc payload..." required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mật khẩu (Password):</label>
+                        <input type="text" id="secPassword" class="form-control font-monospace border-success" placeholder="Nhập mật khẩu..." />
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold py-2">
+                        🛡️ Gửi Request Kiểm Thử (Secure Action)
+                    </button>
+                </form>
+
+                <!-- KHUNG DEBUG SQL CÓ THAM SỐ -->
+                <div class="mt-4">
+                    <label class="fw-bold text-success small text-uppercase">CÂU TRUY VẤN PARAMETERIZED ĐƯỢC PHÒNG THỦ:</label>
+                    <div id="secSqlBox" class="p-3 bg-dark text-info font-monospace rounded small" style="min-height: 60px; word-break: break-all;">
+                        (Chưa có truy vấn nào được thực thi)
+                    </div>
+                </div>
+
+                <!-- KHUNG PHÂN TÍCH PHÒNG THỦ -->
+                <div class="mt-3">
+                    <label class="fw-bold small text-uppercase">KẾT QUẢ & CƠ CHẾ BẢO VỆ:</label>
+                    <div id="secAnalysisBox" class="alert alert-secondary mb-0 small">
+                        Vui lòng nhập thông tin hoặc chọn payload mẫu ở trên rồi bấm gửi.
+                    </div>
+                </div>
+
+                <!-- KẾT QUẢ TRUY VẤN HỢP LỆ -->
+                <div class="mt-3" id="secResultArea" style="display: none;">
+                    <label class="fw-bold text-success small text-uppercase">TÀI KHOẢN ĐĂNG NHẬP THÀNH CÔNG:</label>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered table-striped align-middle small">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Mật khẩu</th>
+                                    <th>Họ Tên</th>
+                                    <th>Vai Trò</th>
+                                    <th>Số Dư</th>
+                                </tr>
+                            </thead>
+                            <tbody id="secTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- GIẢI THÍCH KHOA HỌC & ĐÁNH GIÁ OWASP -->
+<div class="card shadow-sm border-0 mt-4 mb-4">
+    <div class="card-header bg-primary text-white fw-bold">
+        📖 Giải Thích Cơ Chế Tấn Công & Khuyến Nghị Phòng Thủ Chuẩn OWASP
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 border-end">
+                <h6 class="text-danger fw-bold">1. Vì sao câu lệnh bị tấn công thành công?</h6>
+                <p class="small text-secondary mb-2">
+                    Khi nhập <code>' OR '1'='1' --</code>, chuỗi SQL bị ép thành:
+                </p>
+                <div class="p-2 bg-light border font-monospace text-danger small mb-2">
+                    SELECT * FROM Accounts WHERE Username = '' <span class="bg-warning text-dark px-1">OR '1'='1'</span> <span class="badge bg-secondary">--' AND Password = '...'</span>
+                </div>
+                <ul class="small text-secondary ps-3 mb-0">
+                    <li>Dấu nháy đơn <code>'</code> kết thúc sớm giá trị chuỗi của Username.</li>
+                    <li>Mệnh đề <code>OR '1'='1'</code> khiến điều kiện luôn luôn <strong>TRUE</strong> cho mọi dòng trong bảng.</li>
+                    <li>Ký tự <code>--</code> biến toàn bộ phần kiểm tra mật khẩu phía sau thành chú thích (bỏ qua không duyệt).</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-success fw-bold">2. Vì sao Parameterized Query chặn đứng triệt để?</h6>
+                <p class="small text-secondary mb-2">
+                    EF Core chuyển đổi input thành biến tham số riêng biệt (<code>@@p0</code>, <code>@@p1</code>):
+                </p>
+                <div class="p-2 bg-light border font-monospace text-success small mb-2">
+                    SELECT * FROM Accounts WHERE Username = <span class="bg-success text-white px-1">@@p0</span> AND Password = <span class="bg-success text-white px-1">@@p1</span>
+                </div>
+                <ul class="small text-secondary ps-3 mb-0">
+                    <li>SQL Server biên dịch cấu trúc cây truy vấn (Execution Plan) <strong>trước</strong> khi nhận giá trị.</li>
+                    <li>Toàn bộ chuỗi <code>' OR '1'='1' --</code> chỉ được coi là giá trị văn bản đơn thuần (literal value).</li>
+                    <li>Dấu nháy đơn và từ khóa SQL mất hoàn toàn khả năng can thiệp vào logic thực thi của hệ CSDL.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Điền nhanh payload vào form
+    function applyPayload(u, p) {
+        document.getElementById('vulnUsername').value = u;
+        document.getElementById('vulnPassword').value = p;
+        document.getElementById('secUsername').value = u;
+        document.getElementById('secPassword').value = p;
+    }
+
+    function clearForms() {
+        document.getElementById('vulnUsername').value = '';
+        document.getElementById('vulnPassword').value = '';
+        document.getElementById('secUsername').value = '';
+        document.getElementById('secPassword').value = '';
+        document.getElementById('vulnSqlBox').innerText = '(Chưa có truy vấn nào được thực thi)';
+        document.getElementById('secSqlBox').innerText = '(Chưa có truy vấn nào được thực thi)';
+        document.getElementById('vulnAnalysisBox').className = 'alert alert-secondary mb-0 small';
+        document.getElementById('vulnAnalysisBox').innerText = 'Vui lòng nhập thông tin hoặc chọn payload mẫu ở trên rồi bấm gửi.';
+        document.getElementById('secAnalysisBox').className = 'alert alert-secondary mb-0 small';
+        document.getElementById('secAnalysisBox').innerText = 'Vui lòng nhập thông tin hoặc chọn payload mẫu ở trên rồi bấm gửi.';
+        document.getElementById('vulnResultArea').style.display = 'none';
+        document.getElementById('secResultArea').style.display = 'none';
+    }
+
+    // Submit nhánh Bị Lỗi (Fetch API AJAX - Khớp kiến thức buổi 9)
+    async function submitVulnerable(e) {
+        e.preventDefault();
+        const username = document.getElementById('vulnUsername').value;
+        const password = document.getElementById('vulnPassword').value;
+
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('password', password);
+
+        try {
+            const res = await fetch('/SqlInjection/LoginVulnerable', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            // Hiển thị câu SQL đã ghép
+            document.getElementById('vulnSqlBox').innerText = data.executedSql;
+
+            const analysisBox = document.getElementById('vulnAnalysisBox');
+            analysisBox.innerText = data.analysis;
+
+            if (data.isExploited) {
+                analysisBox.className = 'alert alert-danger mb-0 small fw-bold';
+            } else if (data.success) {
+                analysisBox.className = 'alert alert-success mb-0 small';
+            } else {
+                analysisBox.className = 'alert alert-warning mb-0 small';
+            }
+
+            // Hiển thị danh sách tài khoản bị lộ
+            const tableBody = document.getElementById('vulnTableBody');
+            tableBody.innerHTML = '';
+            if (data.accounts && data.accounts.length > 0) {
+                data.accounts.forEach(a => {
+                    const row = `<tr>
+                        <td><strong>${a.id}</strong></td>
+                        <td><span class="badge bg-secondary">${a.username}</span></td>
+                        <td><code class="text-danger fw-bold">${a.password}</code></td>
+                        <td>${a.fullName}</td>
+                        <td><span class="badge ${a.role === 'Admin' ? 'bg-danger' : 'bg-primary'}">${a.role}</span></td>
+                        <td class="text-end text-success fw-bold">${a.balance}</td>
+                        <td class="text-danger">${a.secretNote}</td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                });
+                document.getElementById('vulnResultArea').style.display = 'block';
+            } else {
+                document.getElementById('vulnResultArea').style.display = 'none';
+            }
+        } catch (err) {
+            alert('Lỗi gửi request: ' + err);
+        }
+    }
+
+    // Submit nhánh An Toàn (Fetch API AJAX)
+    async function submitSecure(e) {
+        e.preventDefault();
+        const username = document.getElementById('secUsername').value;
+        const password = document.getElementById('secPassword').value;
+
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('password', password);
+
+        try {
+            const res = await fetch('/SqlInjection/LoginSecure', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            document.getElementById('secSqlBox').innerText = data.executedSql + '\n\n' + data.parameters;
+
+            const analysisBox = document.getElementById('secAnalysisBox');
+            analysisBox.innerText = data.analysis;
+
+            if (data.success) {
+                analysisBox.className = 'alert alert-success mb-0 small fw-bold';
+            } else {
+                analysisBox.className = 'alert alert-info mb-0 small fw-bold';
+            }
+
+            const tableBody = document.getElementById('secTableBody');
+            tableBody.innerHTML = '';
+            if (data.accounts && data.accounts.length > 0) {
+                data.accounts.forEach(a => {
+                    const row = `<tr>
+                        <td><strong>${a.id}</strong></td>
+                        <td><span class="badge bg-success">${a.username}</span></td>
+                        <td><code>${a.password}</code></td>
+                        <td>${a.fullName}</td>
+                        <td><span class="badge bg-primary">${a.role}</span></td>
+                        <td class="text-end text-success fw-bold">${a.balance}</td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                });
+                document.getElementById('secResultArea').style.display = 'block';
+            } else {
+                document.getElementById('secResultArea').style.display = 'none';
+            }
+        } catch (err) {
+            alert('Lỗi gửi request: ' + err);
+        }
+    }
+
+    // Reset CSDL
+    async function resetDatabase() {
+        if (!confirm('Khôi phục cơ sở dữ liệu về trạng thái seed ban đầu?')) return;
+        try {
+            const res = await fetch('/SqlInjection/ResetDatabase', { method: 'POST' });
+            const data = await res.json();
+            alert(data.message);
+            clearForms();
+        } catch (err) {
+            alert('Lỗi: ' + err);
+        }
+    }
+</script>
+}
