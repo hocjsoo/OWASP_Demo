@@ -249,15 +249,14 @@ p.font.size = Pt(12.5)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(6)
 
-# Slide 5: Minh chứng Web UI - SẮP XẾP GỌN GÀNG, KHÔNG ĐÈ FOOTER
+# Slide 5: Minh chứng Web UI
 s5 = prs.slides.add_slide(blank_layout)
 add_header(s5, "4. Minh Chứng Thực Nghiệm 1: Giao Diện Trình Duyệt Web (Đối Chứng Song Song)")
 web_img = "/media/hocjsoo/New Volume/OWASP_Demo/screenshots/only_cards.png"
 if os.path.exists(web_img):
-    # Width 10.0 inches, height ~ 5.34 inches. Top: 1.4 inches -> Bottom: 6.74 inches. Footer starts at 7.15 inches!
     s5.shapes.add_picture(web_img, Inches(1.66), Inches(1.4), width=Inches(10.0))
 
-# Slide 6: Minh chứng Dòng Lệnh & SQL Server - CHỮ TO RÕ RÀNG
+# Slide 6: Minh chứng Dòng Lệnh & SQL Server
 s6 = prs.slides.add_slide(blank_layout)
 add_header(s6, "5. Minh Chứng Thực Nghiệm 2: Tầng API (cURL) & CSDL SQL Server 2025 (Không Dùng Web UI)")
 img_cli = "/media/hocjsoo/New Volume/OWASP_Demo/screenshots/04_Terminal_cURL_Exploit.png"
@@ -277,85 +276,107 @@ p.font.size = Pt(12)
 p.font.bold = True
 p.font.color.rgb = TEXT_DARK
 
-# Slide 7: Phòng thủ
+# SLIDE 7: ẢNH CHỤP THỰC TẾ TRỰC TIẾP TRÊN VS CODE CỦA SINH VIÊN (100% AUTHENTIC)
 s7 = prs.slides.add_slide(blank_layout)
-add_header(s7, "6. Biện Pháp Phòng Thủ Chuẩn Trong ASP.NET Core MVC")
-box7 = s7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.3), Inches(5.7), Inches(5.4))
-box7.fill.solid()
-box7.fill.fore_color.rgb = CARD_BG
-box7.line.color.rgb = ACCENT_GREEN
-tb7_1 = s7.shapes.add_textbox(Inches(1.0), Inches(1.4), Inches(5.3), Inches(5.1))
-tf7_1 = tb7_1.text_frame
-tf7_1.word_wrap = True
-p = tf7_1.paragraphs[0]
+add_header(s7, "6. Minh Chứng Thực Nghiệm 3: Thao Tác Trực Tiếp Trên VS Code & Extension SQL Server")
+real_img = "/media/hocjsoo/New Volume/OWASP_Demo/screenshots/my_vscode_sql_real.png"
+if os.path.exists(real_img):
+    s7.shapes.add_picture(real_img, Inches(0.8), Inches(1.5), width=Inches(11.7))
+
+tb_real = s7.shapes.add_textbox(Inches(0.8), Inches(4.5), Inches(11.7), Inches(2.4))
+tf_real = tb_real.text_frame
+tf_real.word_wrap = True
+p = tf_real.paragraphs[0]
+p.text = "Xác nhận môi trường thực nghiệm thực tế của sinh viên:"
+p.font.size = Pt(15)
+p.font.bold = True
+p.font.color.rgb = ACCENT_BLUE
+
+p = tf_real.add_paragraph()
+p.text = "• Công cụ: Visual Studio Code kết hợp Extension Microsoft MSSQL.\n• Máy chủ CSDL: Microsoft SQL Server 2025 Developer chạy trực tiếp trên Localhost (Port 1433).\n• Cơ sở dữ liệu: OwaspDemoDB, bảng Accounts chứa dữ liệu thực nghiệm (Admin, Chuyên gia, Khách hàng).\n• Kết quả: Bảng dữ liệu được truy vấn và hiển thị trực tiếp trong trình soạn thảo, hoàn toàn đồng bộ với kết quả trích xuất trên ứng dụng web."
+p.font.size = Pt(13)
+p.font.color.rgb = TEXT_DARK
+p.space_before = Pt(8)
+
+# Slide 8: Phòng thủ
+s8 = prs.slides.add_slide(blank_layout)
+add_header(s8, "7. Biện Pháp Phòng Thủ Chuẩn Trong ASP.NET Core MVC")
+box8 = s8.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.3), Inches(5.7), Inches(5.4))
+box8.fill.solid()
+box8.fill.fore_color.rgb = CARD_BG
+box8.line.color.rgb = ACCENT_GREEN
+tb8_1 = s8.shapes.add_textbox(Inches(1.0), Inches(1.4), Inches(5.3), Inches(5.1))
+tf8_1 = tb8_1.text_frame
+tf8_1.word_wrap = True
+p = tf8_1.paragraphs[0]
 p.text = "Cách Viết Code Chuẩn Hóa Với EF Core"
 p.font.size = Pt(14)
 p.font.bold = True
 p.font.color.rgb = ACCENT_GREEN
-p = tf7_1.add_paragraph()
+p = tf8_1.add_paragraph()
 p.text = "// Dùng LINQ Parameterized (KHUYÊN DÙNG):\nvar account = _context.Accounts\n    .FirstOrDefault(a => a.Username == user \n                      && a.Password == pass);\n\n// Hoặc dùng FromSqlInterpolated nếu viết SQL thuần:\nvar account = _context.Accounts\n    .FromSqlInterpolated($\"SELECT * FROM Accounts WHERE Username={user} AND Password={pass}\")\n    .FirstOrDefault();"
 p.font.name = "Courier New"
 p.font.size = Pt(10)
 p.font.color.rgb = RGBColor(22, 101, 52)
 p.space_before = Pt(8)
-p = tf7_1.add_paragraph()
+p = tf8_1.add_paragraph()
 p.text = "Tại sao cách này an toàn tuyệt đối?"
 p.font.size = Pt(12)
 p.font.bold = True
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(12)
-p = tf7_1.add_paragraph()
+p = tf8_1.add_paragraph()
 p.text = "SQL Server biên dịch cấu trúc lệnh TRƯỚC khi gán dữ liệu. Biến @p0 nhận toàn bộ payload như một chuỗi chữ bình thường, vô hiệu hóa hoàn toàn ý đồ chèn lệnh."
 p.font.size = Pt(11)
 p.font.color.rgb = TEXT_MUTED
 p.space_before = Pt(4)
 
-tb7_2 = s7.shapes.add_textbox(Inches(6.9), Inches(1.3), Inches(5.6), Inches(5.4))
-tf7_2 = tb7_2.text_frame
-tf7_2.word_wrap = True
-p = tf7_2.paragraphs[0]
+tb8_2 = s8.shapes.add_textbox(Inches(6.9), Inches(1.3), Inches(5.6), Inches(5.4))
+tf8_2 = tb8_2.text_frame
+tf8_2.word_wrap = True
+p = tf8_2.paragraphs[0]
 p.text = "Bộ Quy Tắc Phòng Thủ Toàn Diện (Defense in Depth)"
 p.font.size = Pt(15)
 p.font.bold = True
 p.font.color.rgb = ACCENT_BLUE
-p = tf7_2.add_paragraph()
+p = tf8_2.add_paragraph()
 p.text = "1. Luôn sử dụng Parameterized Query / ORM:\nTuyệt đối không ghép chuỗi SQL thủ công dưới bất kỳ hình thức nào."
 p.font.size = Pt(12)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(10)
-p = tf7_2.add_paragraph()
+p = tf8_2.add_paragraph()
 p.text = "2. Nguyên tắc đặc quyền tối thiểu (Least Privilege):\nTài khoản kết nối CSDL của ứng dụng chỉ có quyền SELECT/INSERT/UPDATE trên các bảng cần thiết, không bao giờ dùng tài khoản 'sa' hay quyền DDL (DROP, ALTER)."
 p.font.size = Pt(12)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(8)
-p = tf7_2.add_paragraph()
+p = tf8_2.add_paragraph()
 p.text = "3. Xác thực dữ liệu đầu vào (Input Validation):\nSử dụng Data Annotations ([RegularExpression], [StringLength]) kiểm tra chặt chẽ khuôn dạng dữ liệu."
 p.font.size = Pt(12)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(8)
-p = tf7_2.add_paragraph()
+p = tf8_2.add_paragraph()
 p.text = "4. Mã hóa mật khẩu một chiều (Password Hashing):\nSử dụng ASP.NET Core Identity (PBKDF2/BCrypt) để nếu CSDL có bị lộ, mật khẩu vẫn được bảo vệ an toàn."
 p.font.size = Pt(12)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(8)
 
-# Slide 8: Kết luận
-s8 = prs.slides.add_slide(blank_layout)
-add_header(s8, "7. Tổng Kết & Bài Học Rút Ra Cho Dự Án Website Tư Vấn Trực Tuyến")
-tb8 = s8.shapes.add_textbox(Inches(1.0), Inches(1.6), Inches(11.333), Inches(4.8))
-tf8 = tb8.text_frame
-tf8.word_wrap = True
-p = tf8.paragraphs[0]
+# Slide 9: Kết luận
+s9 = prs.slides.add_slide(blank_layout)
+add_header(s9, "8. Tổng Kết & Bài Học Rút Ra Cho Dự Án Website Tư Vấn Trực Tuyến")
+tb9 = s9.shapes.add_textbox(Inches(1.0), Inches(1.6), Inches(11.333), Inches(4.8))
+tf9 = tb9.text_frame
+tf9.word_wrap = True
+p = tf9.paragraphs[0]
 p.text = "KẾT LUẬN THỰC NGHIỆM:"
 p.font.size = Pt(18)
 p.font.bold = True
 p.font.color.rgb = ACCENT_RED
-p = tf8.add_paragraph()
+p = tf9.add_paragraph()
 p.text = "1. Minh chứng thực nghiệm đã chứng minh rõ ràng: SQL Injection có thể bị khai thác qua cả Giao diện Web (Form) lẫn qua Lệnh gọi API trực tiếp (cURL/Postman). Độ nguy hiểm là mức CRITICAL (9.8/10 theo CVSS v3.1).\n\n2. Lỗ hổng hoàn toàn có thể được loại trừ 100% bằng cách tuân thủ đúng chuẩn công nghệ của môn học: Sử dụng Entity Framework Core với Parameterized Query thay vì ghép chuỗi thủ công.\n\n3. Trong dự án BTL (Website Tư vấn trực tuyến WNC.G01), nhóm cam kết áp dụng triệt để: EF Core DbContext, Data Annotations Validation và ASP.NET Core Identity để bảo vệ an toàn tuyệt đối cho người dùng."
 p.font.size = Pt(14)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(10)
-p = tf8.add_paragraph()
+p = tf9.add_paragraph()
 p.text = "XIN TRÂN TRỌNG CẢM ƠN THẦY VÀ CÁC BẠN ĐÃ THEO DÕI!\nNhóm WNC.G01 sẵn sàng lắng nghe câu hỏi và nhận xét từ giảng viên."
 p.font.size = Pt(16)
 p.font.bold = True
