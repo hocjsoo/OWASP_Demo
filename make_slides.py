@@ -10,7 +10,7 @@ prs.slide_width = Inches(13.333)
 prs.slide_height = Inches(7.5)
 
 # Color Palette
-DARK_BG = RGBColor(26, 32, 44)       # #1A202C
+DARK_BG = RGBColor(15, 23, 42)        # Slate 900
 WHITE = RGBColor(255, 255, 255)
 LIGHT_GRAY = RGBColor(241, 245, 249)
 TEXT_DARK = RGBColor(30, 41, 59)
@@ -23,14 +23,12 @@ CARD_BG = RGBColor(248, 250, 252)
 blank_layout = prs.slide_layouts[6]
 
 def add_header(slide, title_text, category_text="OWASP TOP 10 - A03:2021 (INJECTION)"):
-    # Header bar
-    shape = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(1.2))
+    shape = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(1.1))
     shape.fill.solid()
     shape.fill.fore_color.rgb = DARK_BG
     shape.line.fill.background()
 
-    # Category tag
-    tx_box = slide.shapes.add_textbox(Inches(0.8), Inches(0.15), Inches(11.7), Inches(0.35))
+    tx_box = slide.shapes.add_textbox(Inches(0.8), Inches(0.12), Inches(11.7), Inches(0.35))
     tf = tx_box.text_frame
     tf.word_wrap = True
     p0 = tf.paragraphs[0]
@@ -39,19 +37,17 @@ def add_header(slide, title_text, category_text="OWASP TOP 10 - A03:2021 (INJECT
     p0.font.bold = True
     p0.font.color.rgb = ACCENT_RED
 
-    # Title
     p1 = tf.add_paragraph()
     p1.text = title_text
-    p1.font.size = Pt(20)
+    p1.font.size = Pt(19)
     p1.font.bold = True
     p1.font.color.rgb = WHITE
 
-    # Footer
-    footer = slide.shapes.add_textbox(Inches(0.8), Inches(7.05), Inches(11.7), Inches(0.35))
+    footer = slide.shapes.add_textbox(Inches(0.8), Inches(7.1), Inches(11.7), Inches(0.3))
     ft = footer.text_frame
     p_ft = ft.paragraphs[0]
     p_ft.text = "Nhóm WNC.G01 (HOU) • Môn Lập Trình Web Nâng Cao • ThS. Lê Hữu Dũng"
-    p_ft.font.size = Pt(10)
+    p_ft.font.size = Pt(9.5)
     p_ft.font.color.rgb = TEXT_MUTED
 
 # ==========================================
@@ -81,8 +77,8 @@ p.font.color.rgb = ACCENT_RED
 p.space_before = Pt(14)
 
 p = tf1.add_paragraph()
-p.text = "SQL INJECTION (OWASP A03:2021)\nKịch Bản Tấn Công & Cơ Chế Phòng Thủ Trực Quan Trên ASP.NET Core"
-p.font.size = Pt(28)
+p.text = "SQL INJECTION (OWASP A03:2021)\nKịch Bản Tấn Công & Phòng Thủ Đa Tầng (Web UI, API CLI & CSDL SQL Server 2025)"
+p.font.size = Pt(26)
 p.font.bold = True
 p.font.color.rgb = WHITE
 p.space_before = Pt(8)
@@ -106,7 +102,7 @@ p.space_before = Pt(16)
 s2 = prs.slides.add_slide(blank_layout)
 add_header(s2, "1. Bản Chất Kỹ Thuật Của Lỗ Hổng SQL Injection")
 
-tb2_1 = s2.shapes.add_textbox(Inches(0.8), Inches(1.5), Inches(5.6), Inches(5.2))
+tb2_1 = s2.shapes.add_textbox(Inches(0.8), Inches(1.3), Inches(5.6), Inches(5.4))
 tf2_1 = tb2_1.text_frame
 tf2_1.word_wrap = True
 
@@ -117,31 +113,30 @@ p.font.bold = True
 p.font.color.rgb = ACCENT_RED
 
 p = tf2_1.add_paragraph()
-p.text = "• Không phân tách giữa DỮ LIỆU (Data) và CÂU LỆNH (Code).\n• Lập trình viên ghép chuỗi đầu vào của người dùng trực tiếp vào câu lệnh SQL.\n• Kẻ tấn công lợi dụng các ký tự điều khiển (', --, /*, ;) để 'thoát' khỏi ngữ cảnh dữ liệu và ép SQL Server thực thi logic do hacker chỉ định."
+p.text = "• Không phân tách giữa DỮ LIỆU (Data) và CÂU LỆNH (Code).\n• Ghép chuỗi trực tiếp từ Request vào câu lệnh SQL khiến hệ CSDL không phân biệt được đâu là dữ liệu của user và đâu là cấu trúc lệnh của lập trình viên.\n• Kẻ tấn công lợi dụng các ký tự điều khiển (', --, /*, ;) để 'thoát' khỏi ngữ cảnh dữ liệu và ép SQL Server thực thi logic của hacker."
 p.font.size = Pt(13)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(8)
 
 p = tf2_1.add_paragraph()
-p.text = "Phân Loại Theo Tiêu Chuẩn OWASP WSTG"
+p.text = "Phân Loại Theo Chuẩn OWASP WSTG"
 p.font.size = Pt(16)
 p.font.bold = True
 p.font.color.rgb = ACCENT_BLUE
-p.space_before = Pt(16)
+p.space_before = Pt(14)
 
 p = tf2_1.add_paragraph()
-p.text = "1. In-band SQLi (Khai thác trực diện):\n   - Error-based: Ép CSDL sinh lỗi để đọc dữ liệu.\n   - Union-based: Dùng UNION trích xuất các bảng khác.\n2. Inferential SQLi (Blind SQLi / Mù):\n   - Boolean-based: Đoán dữ liệu qua phản hồi Đúng/Sai.\n   - Time-based: Dùng WAITFOR DELAY đo thời gian.\n3. Out-of-band SQLi: Kích hoạt DNS/HTTP request từ CSDL."
+p.text = "1. In-band SQLi (Khai thác trực diện): Error-based, Union-based.\n2. Inferential SQLi (Blind SQLi / Mù): Boolean-based, Time-based.\n3. Out-of-band SQLi: Kích hoạt DNS/HTTP request từ CSDL."
 p.font.size = Pt(12)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(6)
 
-# Right Box: Code comparison
-box2 = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(6.8), Inches(1.5), Inches(5.7), Inches(5.2))
+box2 = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(6.8), Inches(1.3), Inches(5.7), Inches(5.4))
 box2.fill.solid()
 box2.fill.fore_color.rgb = CARD_BG
 box2.line.color.rgb = RGBColor(226, 232, 240)
 
-tb2_2 = s2.shapes.add_textbox(Inches(7.0), Inches(1.6), Inches(5.3), Inches(5.0))
+tb2_2 = s2.shapes.add_textbox(Inches(7.0), Inches(1.4), Inches(5.3), Inches(5.1))
 tf2_2 = tb2_2.text_frame
 tf2_2.word_wrap = True
 
@@ -166,7 +161,7 @@ p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(14)
 
 p = tf2_2.add_paragraph()
-p.text = "Lập trình viên tin tưởng rằng '{user}' chỉ chứa chữ cái thường. Khi hacker truyền vào ký tự nháy đơn ('), cấu trúc cú pháp của cả câu lệnh bị bẻ gãy hoàn toàn."
+p.text = "Lập trình viên mặc định tin rằng '{user}' chỉ là chuỗi thông thường. Khi hacker truyền vào ký tự nháy đơn ('), toàn bộ cấu trúc cú pháp của câu lệnh bị bẻ gãy."
 p.font.size = Pt(12)
 p.font.color.rgb = TEXT_MUTED
 p.space_before = Pt(4)
@@ -181,13 +176,12 @@ add_header(s3, "2. Độ Nguy Hiểm Thực Tế Của SQL Injection (Tác Độ
 col_w = Inches(3.6)
 gap = Inches(0.4)
 
-# Danger Card 1
-c1 = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.6), col_w, Inches(5.0))
+c1 = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.4), col_w, Inches(5.4))
 c1.fill.solid()
 c1.fill.fore_color.rgb = RGBColor(254, 242, 242)
 c1.line.color.rgb = ACCENT_RED
 
-t1 = s3.shapes.add_textbox(Inches(0.95), Inches(1.8), col_w - Inches(0.3), Inches(4.6))
+t1 = s3.shapes.add_textbox(Inches(0.95), Inches(1.6), col_w - Inches(0.3), Inches(5.0))
 tf = t1.text_frame
 tf.word_wrap = True
 p = tf.paragraphs[0]
@@ -196,18 +190,17 @@ p.font.size = Pt(14)
 p.font.bold = True
 p.font.color.rgb = ACCENT_RED
 p = tf.add_paragraph()
-p.text = "• Không cần biết mật khẩu của bất kỳ ai.\n• Chỉ với 1 chuỗi payload ngắn gọn, kẻ tấn công đăng nhập thẳng vào tài khoản Quản trị viên (Admin).\n• Chiếm đoạt phiên làm việc, thay đổi phân quyền và khóa tài khoản người dùng khác."
+p.text = "• Không cần biết mật khẩu của bất kỳ ai.\n• Chỉ với 1 chuỗi payload ngắn, kẻ tấn công đăng nhập thẳng vào tài khoản Quản trị viên (Admin).\n• Chiếm đoạt phiên làm việc, thay đổi phân quyền và khóa tài khoản người dùng khác."
 p.font.size = Pt(12)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(10)
 
-# Danger Card 2
-c2 = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + col_w + gap, Inches(1.6), col_w, Inches(5.0))
+c2 = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + col_w + gap, Inches(1.4), col_w, Inches(5.4))
 c2.fill.solid()
 c2.fill.fore_color.rgb = RGBColor(255, 251, 235)
 c2.line.color.rgb = RGBColor(217, 119, 6)
 
-t2 = s3.shapes.add_textbox(Inches(0.95) + col_w + gap, Inches(1.8), col_w - Inches(0.3), Inches(4.6))
+t2 = s3.shapes.add_textbox(Inches(0.95) + col_w + gap, Inches(1.6), col_w - Inches(0.3), Inches(5.0))
 tf = t2.text_frame
 tf.word_wrap = True
 p = tf.paragraphs[0]
@@ -216,18 +209,17 @@ p.font.size = Pt(14)
 p.font.bold = True
 p.font.color.rgb = RGBColor(180, 83, 9)
 p = tf.add_paragraph()
-p.text = "• Trích xuất thông tin khách hàng, hồ sơ chuyên gia, số dư tài khoản ngân hàng.\n• Rò rỉ mật khẩu và ghi chú bảo mật cá nhân (Secret Notes).\n• Vi phạm nghiêm trọng luật bảo vệ dữ liệu cá nhân, làm sụp đổ uy tín của nền tảng tư vấn trực tuyến."
+p.text = "• Trích xuất thông tin khách hàng, hồ sơ chuyên gia, số dư tài khoản ngân hàng.\n• Rò rỉ mật khẩu và ghi chú bảo mật cá nhân (Secret Notes).\n• Vi phạm nghiêm trọng luật bảo vệ dữ liệu cá nhân, làm sụp đổ uy tín của hệ thống tư vấn trực tuyến."
 p.font.size = Pt(12)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(10)
 
-# Danger Card 3
-c3 = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + (col_w + gap)*2, Inches(1.6), col_w, Inches(5.0))
+c3 = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + (col_w + gap)*2, Inches(1.4), col_w, Inches(5.4))
 c3.fill.solid()
 c3.fill.fore_color.rgb = RGBColor(241, 245, 249)
 c3.line.color.rgb = DARK_BG
 
-t3 = s3.shapes.add_textbox(Inches(0.95) + (col_w + gap)*2, Inches(1.8), col_w - Inches(0.3), Inches(4.6))
+t3 = s3.shapes.add_textbox(Inches(0.95) + (col_w + gap)*2, Inches(1.6), col_w - Inches(0.3), Inches(5.0))
 tf = t3.text_frame
 tf.word_wrap = True
 p = tf.paragraphs[0]
@@ -248,7 +240,7 @@ p.space_before = Pt(10)
 s4 = prs.slides.add_slide(blank_layout)
 add_header(s4, "3. Kịch Bản Tấn Công: Phân Tích Cơ Chế Bẻ Gãy Cú Pháp")
 
-tb4 = s4.shapes.add_textbox(Inches(0.8), Inches(1.5), Inches(11.7), Inches(5.3))
+tb4 = s4.shapes.add_textbox(Inches(0.8), Inches(1.3), Inches(11.7), Inches(5.4))
 tf4 = tb4.text_frame
 tf4.word_wrap = True
 
@@ -261,7 +253,7 @@ p.font.color.rgb = ACCENT_RED
 p = tf4.add_paragraph()
 p.text = "Input đưa vào ô Username:   ' OR '1'='1' --\nInput đưa vào ô Password:   (Nhập chuỗi bất kỳ hoặc bỏ trống)"
 p.font.name = "Courier New"
-p.font.size = Pt(14)
+p.font.size = Pt(13.5)
 p.font.bold = True
 p.font.color.rgb = ACCENT_BLUE
 p.space_before = Pt(8)
@@ -271,7 +263,7 @@ p.text = "Cấu trúc câu truy vấn được SQL Server thông dịch:"
 p.font.size = Pt(15)
 p.font.bold = True
 p.font.color.rgb = TEXT_DARK
-p.space_before = Pt(16)
+p.space_before = Pt(14)
 
 p = tf4.add_paragraph()
 p.text = "SELECT * FROM Accounts WHERE Username = '' OR '1'='1' --' AND Password = 'xyz'"
@@ -286,27 +278,26 @@ p.text = "3 Thành Phần Của Payload Khai Thác:"
 p.font.size = Pt(15)
 p.font.bold = True
 p.font.color.rgb = TEXT_DARK
-p.space_before = Pt(16)
+p.space_before = Pt(14)
 
 p = tf4.add_paragraph()
-p.text = "1. Dấu nháy đơn (') : Đóng sớm chuỗi ký tự hợp lệ của trường Username, đưa ngữ cảnh về câu lệnh SQL.\n2. Mệnh đề OR '1'='1' : Mệnh đề luận lý chân lý. Vì '1'='1' luôn đúng, toàn bộ mệnh đề WHERE trả về TRUE cho TẤT CẢ các dòng trong bảng.\n3. Ký tự chú thích (--) : Trong SQL Server/SQLite, '--' biến toàn bộ đoạn mã phía sau thành ghi chú vô hiệu, triệt tiêu hoàn toàn bước kiểm tra mật khẩu (AND Password = '...')."
-p.font.size = Pt(13)
+p.text = "1. Dấu nháy đơn (') : Đóng sớm chuỗi ký tự hợp lệ của trường Username, đưa ngữ cảnh về câu lệnh SQL.\n2. Mệnh đề OR '1'='1' : Mệnh đề luận lý chân lý. Vì '1'='1' luôn đúng, toàn bộ mệnh đề WHERE trả về TRUE cho TẤT CẢ các dòng trong bảng.\n3. Ký tự chú thích (--) : Trong SQL Server, '--' biến toàn bộ đoạn mã phía sau thành ghi chú vô hiệu, triệt tiêu hoàn toàn bước kiểm tra mật khẩu (AND Password = '...')."
+p.font.size = Pt(12.5)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(6)
 
 
 # ==========================================
-# SLIDE 5: THỰC NGHIỆM DEMO TRỰC TIẾP
+# SLIDE 5: MINH CHỨNG THỰC NGHIỆM TRÊN WEB UI
 # ==========================================
 s5 = prs.slides.add_slide(blank_layout)
-add_header(s5, "4. Minh Chứng Thực Nghiệm Demo Đối Chứng Trực Tiếp")
+add_header(s5, "4. Minh Chứng Thực Nghiệm 1: Giao Diện Trình Duyệt Web (Đối Chứng)")
 
-# Left: Exploit screenshot
 img_path1 = "/media/hocjsoo/New Volume/OWASP_Demo/screenshots/02_Tan_Cong_Bypass_Thanh_Cong.png"
 if os.path.exists(img_path1):
-    s5.shapes.add_picture(img_path1, Inches(0.8), Inches(1.5), Inches(5.6), Inches(4.5))
+    s5.shapes.add_picture(img_path1, Inches(0.8), Inches(1.3), Inches(5.6), Inches(4.5))
 
-lbl1 = s5.shapes.add_textbox(Inches(0.8), Inches(6.1), Inches(5.6), Inches(0.8))
+lbl1 = s5.shapes.add_textbox(Inches(0.8), Inches(5.9), Inches(5.6), Inches(1.0))
 tf = lbl1.text_frame
 tf.word_wrap = True
 p = tf.paragraphs[0]
@@ -315,12 +306,11 @@ p.font.size = Pt(11)
 p.font.bold = True
 p.font.color.rgb = ACCENT_RED
 
-# Right: Defense screenshot
 img_path2 = "/media/hocjsoo/New Volume/OWASP_Demo/screenshots/03_So_Sanh_Phong_Thu_Thanh_Cong.png"
 if os.path.exists(img_path2):
-    s5.shapes.add_picture(img_path2, Inches(6.8), Inches(1.5), Inches(5.7), Inches(4.5))
+    s5.shapes.add_picture(img_path2, Inches(6.8), Inches(1.3), Inches(5.7), Inches(4.5))
 
-lbl2 = s5.shapes.add_textbox(Inches(6.8), Inches(6.1), Inches(5.7), Inches(0.8))
+lbl2 = s5.shapes.add_textbox(Inches(6.8), Inches(5.9), Inches(5.7), Inches(1.0))
 tf = lbl2.text_frame
 tf.word_wrap = True
 p = tf.paragraphs[0]
@@ -331,81 +321,142 @@ p.font.color.rgb = ACCENT_GREEN
 
 
 # ==========================================
-# SLIDE 6: BIỆN PHÁP PHÒNG THỦ
+# SLIDE 6: MINH CHỨNG KHÔNG DÙNG WEB (CLI & SQL SERVER) - ĐỘC QUYỀN
 # ==========================================
 s6 = prs.slides.add_slide(blank_layout)
-add_header(s6, "5. Biện Pháp Phòng Thủ Chuẩn Trong ASP.NET Core MVC")
+add_header(s6, "5. Minh Chứng Thực Nghiệm 2: Tầng API (cURL) & CSDL SQL Server 2025 (Không Dùng Web UI)")
 
-# Card Left: Code phòng thủ
-box6 = s6.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.5), Inches(5.7), Inches(5.2))
-box6.fill.solid()
-box6.fill.fore_color.rgb = CARD_BG
-box6.line.color.rgb = ACCENT_GREEN
+img_path3 = "/media/hocjsoo/New Volume/OWASP_Demo/screenshots/04_Terminal_cURL_Exploit.png"
+if os.path.exists(img_path3):
+    s6.shapes.add_picture(img_path3, Inches(0.8), Inches(1.3), Inches(5.6), Inches(4.5))
 
-tb6_1 = s6.shapes.add_textbox(Inches(1.0), Inches(1.6), Inches(5.3), Inches(5.0))
-tf6_1 = tb6_1.text_frame
-tf6_1.word_wrap = True
+lbl3 = s6.shapes.add_textbox(Inches(0.8), Inches(5.9), Inches(5.6), Inches(1.0))
+tf = lbl3.text_frame
+tf.word_wrap = True
+p = tf.paragraphs[0]
+p.text = "💻 MINH CHỨNG 1 (API / cURL CLI):\nBắn HTTP POST trực tiếp từ Terminal → Nhận JSON rò rỉ dữ liệu, chứng minh lỗ hổng ở tầng Backend C#."
+p.font.size = Pt(10.5)
+p.font.bold = True
+p.font.color.rgb = ACCENT_BLUE
 
-p = tf6_1.paragraphs[0]
+img_path4 = "/media/hocjsoo/New Volume/OWASP_Demo/screenshots/05_SQLServer_Direct_Query.png"
+if os.path.exists(img_path4):
+    s6.shapes.add_picture(img_path4, Inches(6.8), Inches(1.3), Inches(5.7), Inches(4.5))
+
+lbl4 = s6.shapes.add_textbox(Inches(6.8), Inches(5.9), Inches(5.7), Inches(1.0))
+tf = lbl4.text_frame
+tf.word_wrap = True
+p = tf.paragraphs[0]
+p.text = "🗄️ MINH CHỨNG 2 (SQL Server 2025 Thật):\nThực thi đối chứng trong SQL Server (OwaspDemoDB). Câu lệnh bị inject trả về 4 rows, câu có tham số trả về 0 row."
+p.font.size = Pt(10.5)
+p.font.bold = True
+p.font.color.rgb = ACCENT_GREEN
+
+
+# ==========================================
+# SLIDE 7: BIỆN PHÁP PHÒNG THỦ TRONG ASP.NET CORE
+# ==========================================
+s7 = prs.slides.add_slide(blank_layout)
+add_header(s7, "6. Biện Pháp Phòng Thủ Chuẩn Trong ASP.NET Core MVC")
+
+box7 = s7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.3), Inches(5.7), Inches(5.4))
+box7.fill.solid()
+box7.fill.fore_color.rgb = CARD_BG
+box7.line.color.rgb = ACCENT_GREEN
+
+tb7_1 = s7.shapes.add_textbox(Inches(1.0), Inches(1.4), Inches(5.3), Inches(5.1))
+tf7_1 = tb7_1.text_frame
+tf7_1.word_wrap = True
+
+p = tf7_1.paragraphs[0]
 p.text = "Cách Viết Code Chuẩn Hóa Với EF Core"
 p.font.size = Pt(14)
 p.font.bold = True
 p.font.color.rgb = ACCENT_GREEN
 
-p = tf6_1.add_paragraph()
+p = tf7_1.add_paragraph()
 p.text = "// Dùng LINQ Parameterized (KHUYÊN DÙNG):\nvar account = _context.Accounts\n    .FirstOrDefault(a => a.Username == user \n                      && a.Password == pass);\n\n// Hoặc dùng FromSqlInterpolated nếu viết SQL thuần:\nvar account = _context.Accounts\n    .FromSqlInterpolated($\"SELECT * FROM Accounts WHERE Username={user} AND Password={pass}\")\n    .FirstOrDefault();"
 p.font.name = "Courier New"
-p.font.size = Pt(10.5)
+p.font.size = Pt(10)
 p.font.color.rgb = RGBColor(22, 101, 52)
 p.space_before = Pt(8)
 
-p = tf6_1.add_paragraph()
+p = tf7_1.add_paragraph()
 p.text = "Tại sao cách này an toàn tuyệt đối?"
 p.font.size = Pt(12)
 p.font.bold = True
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(12)
 
-p = tf6_1.add_paragraph()
+p = tf7_1.add_paragraph()
 p.text = "SQL Server biên dịch cấu trúc lệnh TRƯỚC khi gán dữ liệu. Biến @p0 nhận toàn bộ payload như một chuỗi chữ bình thường, vô hiệu hóa hoàn toàn ý đồ chèn lệnh."
 p.font.size = Pt(11)
 p.font.color.rgb = TEXT_MUTED
 p.space_before = Pt(4)
 
-# Card Right: Bộ nguyên tắc phòng thủ
-tb6_2 = s6.shapes.add_textbox(Inches(6.9), Inches(1.5), Inches(5.6), Inches(5.2))
-tf6_2 = tb6_2.text_frame
-tf6_2.word_wrap = True
+tb7_2 = s7.shapes.add_textbox(Inches(6.9), Inches(1.3), Inches(5.6), Inches(5.4))
+tf7_2 = tb7_2.text_frame
+tf7_2.word_wrap = True
 
-p = tf6_2.paragraphs[0]
+p = tf7_2.paragraphs[0]
 p.text = "Bộ Quy Tắc Phòng Thủ Toàn Diện (Defense in Depth)"
 p.font.size = Pt(15)
 p.font.bold = True
 p.font.color.rgb = ACCENT_BLUE
 
-p = tf6_2.add_paragraph()
+p = tf7_2.add_paragraph()
 p.text = "1. Luôn sử dụng Parameterized Query / ORM:\nTuyệt đối không ghép chuỗi SQL thủ công dưới bất kỳ hình thức nào."
 p.font.size = Pt(12)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(10)
 
-p = tf6_2.add_paragraph()
+p = tf7_2.add_paragraph()
 p.text = "2. Nguyên tắc đặc quyền tối thiểu (Least Privilege):\nTài khoản kết nối CSDL của ứng dụng chỉ có quyền SELECT/INSERT/UPDATE trên các bảng cần thiết, không bao giờ dùng tài khoản 'sa' hay quyền DDL (DROP, ALTER)."
 p.font.size = Pt(12)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(8)
 
-p = tf6_2.add_paragraph()
+p = tf7_2.add_paragraph()
 p.text = "3. Xác thực dữ liệu đầu vào (Input Validation):\nSử dụng Data Annotations ([RegularExpression], [StringLength]) kiểm tra chặt chẽ khuôn dạng dữ liệu."
 p.font.size = Pt(12)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(8)
 
-p = tf6_2.add_paragraph()
+p = tf7_2.add_paragraph()
 p.text = "4. Mã hóa mật khẩu một chiều (Password Hashing):\nSử dụng ASP.NET Core Identity (PBKDF2/BCrypt) để nếu CSDL có bị lộ, mật khẩu vẫn được bảo vệ an toàn."
 p.font.size = Pt(12)
 p.font.color.rgb = TEXT_DARK
 p.space_before = Pt(8)
+
+
+# ==========================================
+# SLIDE 8: KẾT LUẬN & TRẢ LỜI CÂU HỎI
+# ==========================================
+s8 = prs.slides.add_slide(blank_layout)
+add_header(s8, "7. Tổng Kết & Bài Học Rút Ra Cho Dự Án Website Tư Vấn Trực Tuyến")
+
+tb8 = s8.shapes.add_textbox(Inches(1.0), Inches(1.6), Inches(11.333), Inches(4.8))
+tf8 = tb8.text_frame
+tf8.word_wrap = True
+
+p = tf8.paragraphs[0]
+p.text = "KẾT LUẬN THỰC NGHIỆM:"
+p.font.size = Pt(18)
+p.font.bold = True
+p.font.color.rgb = ACCENT_RED
+
+p = tf8.add_paragraph()
+p.text = "1. Minh chứng thực nghiệm đã chứng minh rõ ràng: SQL Injection có thể bị khai thác qua cả Giao diện Web (Form) lẫn qua Lệnh gọi API trực tiếp (cURL/Postman). Độ nguy hiểm là mức CRITICAL (9.8/10 theo CVSS v3.1).\n\n2. Lỗ hổng hoàn toàn có thể được loại trừ 100% bằng cách tuân thủ đúng chuẩn công nghệ của môn học: Sử dụng Entity Framework Core với Parameterized Query thay vì ghép chuỗi thủ công.\n\n3. Trong dự án BTL (Website Tư vấn trực tuyến WNC.G01), nhóm cam kết áp dụng triệt để: EF Core DbContext, Data Annotations Validation và ASP.NET Core Identity để bảo vệ an toàn tuyệt đối cho người dùng."
+p.font.size = Pt(14)
+p.font.color.rgb = TEXT_DARK
+p.space_before = Pt(10)
+
+p = tf8.add_paragraph()
+p.text = "XIN TRÂN TRỌNG CẢM ƠN THẦY VÀ CÁC BẠN ĐÃ THEO DÕI!\nNhóm WNC.G01 sẵn sàng lắng nghe câu hỏi và nhận xét từ giảng viên."
+p.font.size = Pt(16)
+p.font.bold = True
+p.font.color.rgb = ACCENT_BLUE
+p.space_before = Pt(24)
 
 output_file = "/media/hocjsoo/New Volume/OWASP_Demo/Slide_OWASP_SQL_Injection.pptx"
 prs.save(output_file)
