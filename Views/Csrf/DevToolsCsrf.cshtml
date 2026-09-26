@@ -1,0 +1,117 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>Chrome DevTools - Network & Form Inspection (CSRF Attack)</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #202124; color: #e8eaed; overflow: hidden; height: 100vh; }
+        .chrome-frame { display: flex; flex-direction: column; height: 100vh; }
+        .chrome-tabs { background: #1f1f1f; display: flex; align-items: center; padding: 8px 12px 0; gap: 6px; }
+        .chrome-tab { background: #292a2d; color: #fff; padding: 6px 14px; border-radius: 8px 8px 0 0; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+        .chrome-address-bar { background: #292a2d; padding: 6px 16px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #9aa0a6; border-bottom: 1px solid #3c4043; }
+        .address-input { background: #1f1f1f; color: #fff; padding: 4px 12px; border-radius: 20px; flex: 1; border: 1px solid #3c4043; font-family: monospace; }
+        .split-container { display: flex; flex: 1; height: calc(100vh - 80px); }
+        .app-pane { width: 50%; border-right: 2px solid #3c4043; background: #fdf2f2; color: #212529; overflow-y: auto; padding: 20px; text-align: center; }
+        .devtools-pane { width: 50%; display: flex; flex-direction: column; background: #202124; }
+        .dt-header { background: #292a2d; display: flex; border-bottom: 1px solid #3c4043; font-size: 12px; }
+        .dt-tab { padding: 8px 14px; color: #9aa0a6; cursor: pointer; border-bottom: 2px solid transparent; }
+        .dt-tab.active { color: #8ab4f8; border-bottom: 2px solid #8ab4f8; font-weight: bold; background: #202124; }
+        .dt-details { flex: 1; background: #202124; padding: 12px; overflow-y: auto; font-family: monospace; font-size: 11.5px; }
+        .dt-detail-tabs { display: flex; gap: 12px; border-bottom: 1px solid #3c4043; padding-bottom: 6px; margin-bottom: 10px; font-size: 11px; }
+        .dt-detail-tab.active { color: #8ab4f8; font-weight: bold; border-bottom: 2px solid #8ab4f8; padding-bottom: 4px; }
+        .network-table { width: 100%; border-collapse: collapse; font-size: 11px; font-family: monospace; margin-bottom: 8px; }
+        .network-table th { background: #292a2d; color: #9aa0a6; text-align: left; padding: 6px 8px; border-bottom: 1px solid #3c4043; }
+        .network-table td { padding: 6px 8px; border-bottom: 1px solid #292a2d; color: #e8eaed; }
+        .network-table tr.selected { background: #283b58; }
+        .csrf-box { background: #3c1e22; border-left: 3px solid #ea4335; padding: 8px; margin: 6px 0; color: #f28b82; }
+    </style>
+</head>
+<body>
+    <div class="chrome-frame">
+        <div class="chrome-tabs">
+            <div class="chrome-tab">🎁 Attacker Fake Site (CSRF) &bull; DevTools</div>
+        </div>
+        <div class="chrome-address-bar">
+            <span>⚠️ Không bảo mật</span>
+            <div class="address-input">http://attacker-site.com/iphone-reward.html</div>
+            <span>⚙️</span>
+        </div>
+
+        <div class="split-container">
+            <!-- Left: Attacker Fake Page -->
+            <div class="app-pane">
+                <div class="card border-danger shadow p-4 mx-auto" style="max-width: 480px; background: #fff;">
+                    <h4 class="text-danger fw-bold">🎉 CHÚC MỪNG TRÚNG THƯỞNG!</h4>
+                    <p class="small text-muted mb-3">Bạn được tặng iPhone 16 Pro Max trị giá 35.000.000 VNĐ</p>
+                    <div class="alert alert-warning p-2 small mb-3 text-start">
+                        ⚠️ <strong>BẪY CSRF:</strong> Nút bấm dưới đây kích hoạt một form ẩn gửi POST sang máy chủ tư vấn trực tuyến!
+                    </div>
+                    <button class="btn btn-danger btn-lg w-100 fw-bold py-2 shadow-sm">
+                        🎁 BẤM ĐỂ NHẬN QUÀ NGAY!
+                    </button>
+                    <div class="mt-2 text-muted" style="font-size:10px;">
+                        * Tự động gửi ngầm: POST /Csrf/TransferVulnerable (amount=20.000.000)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: DevTools Network Headers & Payload -->
+            <div class="devtools-pane">
+                <div class="dt-header">
+                    <div class="dt-tab">Elements</div>
+                    <div class="dt-tab">Console</div>
+                    <div class="dt-tab">Sources</div>
+                    <div class="dt-tab active">Network</div>
+                    <div class="dt-tab">Application</div>
+                </div>
+
+                <div class="dt-details">
+                    <table class="network-table">
+                        <thead><tr><th>Name</th><th>Status</th><th>Type</th><th>Size</th><th>Time</th></tr></thead>
+                        <tbody>
+                            <tr class="selected">
+                                <td><span style="color:#f28b82;">⚡ TransferVulnerable</span></td>
+                                <td><span style="color:#81c995;">302 Found</span></td>
+                                <td>document</td>
+                                <td>450 B</td>
+                                <td>15 ms</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="dt-detail-tabs">
+                        <span class="dt-detail-tab active">Headers</span>
+                        <span class="dt-detail-tab">Payload</span>
+                        <span class="dt-detail-tab">Response</span>
+                    </div>
+
+                    <div>
+                        <span style="color:#9aa0a6;">▼ General:</span><br/>
+                        &nbsp;&nbsp;Request URL: <span style="color:#fff;">http://localhost:5076/Csrf/TransferVulnerable</span><br/>
+                        &nbsp;&nbsp;Request Method: <span style="color:#8ab4f8; font-weight:bold;">POST</span><br/>
+                        &nbsp;&nbsp;Status Code: <span style="color:#81c995;">302 Found</span>
+                    </div>
+
+                    <div class="mt-2">
+                        <span style="color:#9aa0a6;">▼ Request Headers (Trình duyệt tự động đính kèm Cookie của nạn nhân):</span><br/>
+                        &nbsp;&nbsp;<span style="color:#8ab4f8;">Origin:</span> <span style="color:#f28b82;">http://attacker-site.com (TÊN MIỀN HACKER)</span><br/>
+                        &nbsp;&nbsp;<span style="color:#8ab4f8;">Referer:</span> http://attacker-site.com/iphone-reward.html<br/>
+                        &nbsp;&nbsp;<span style="color:#8ab4f8; font-weight:bold;">Cookie:</span> <span style="color:#ea4335; font-weight:bold;">.AspNetCore.Session=CfDJ8... (COOKIE HỢP LỆ CỦA NẠN NHÂN)</span>
+                    </div>
+
+                    <div class="csrf-box mt-3">
+                        🚨 <strong>ĐIỂM YẾU CỐT LÕI (ROOT CAUSE):</strong><br/>
+                        Form gửi đi hoàn toàn <strong>KHÔNG CÓ __RequestVerificationToken</strong>!<br/>
+                        Vì Action thiếu <code>[ValidateAntiForgeryToken]</code>, máy chủ chỉ kiểm tra Cookie hợp lệ rồi trừ tiền ngay mà không xác minh nguồn gốc yêu cầu!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

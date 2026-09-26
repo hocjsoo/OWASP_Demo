@@ -29,6 +29,12 @@ public class XssController : Controller
         return View(comments);
     }
 
+    [HttpGet]
+    public IActionResult DevToolsXss()
+    {
+        return View();
+    }
+
     // 1. NHÁNH LỖI (Vulnerable): Lưu mã độc raw HTML không lọc
     [HttpPost]
     public IActionResult AddVulnerable(string author, string content)

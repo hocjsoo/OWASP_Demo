@@ -263,16 +263,16 @@ add_p(tf, "Mở Rộng Kỹ Thuật Union-Based:\nPayload: ' UNION SELECT Id, Us
 
 # Slide 5: Minh chứng Web UI (Nhúng ảnh thật - CĂN CHUẨN KHÔNG ĐÈ)
 s5 = prs.slides.add_slide(blank_layout)
-add_header(s5, "1.4. SQL Injection: Minh Chứng Thực Nghiệm Trực Quan Trên Web UI", "CHỦ ĐỀ 1 • NGUYỄN DANH HỌC (23A1001D0158)")
-p_sqli = "/media/hocjsoo/New Volume/OWASP_Demo/screenshots/final_sqli_proof.png"
+add_header(s5, "1.4. SQL Injection: Minh Chứng Kiểm Thử Qua Chrome DevTools (Network)", "CHỦ ĐỀ 1 • NGUYỄN DANH HỌC (23A1001D0158)")
+p_sqli = "/media/hocjsoo/New Volume/OWASP_Demo/screenshots/01_sqli_devtools_proof.png"
 if os.path.exists(p_sqli):
-    s5.shapes.add_picture(p_sqli, Inches(2.26), Inches(1.35), width=Inches(8.8))
+    s5.shapes.add_picture(p_sqli, Inches(2.06), Inches(1.35), width=Inches(9.2))
 
 cap5 = s5.shapes.add_textbox(Inches(0.8), Inches(6.62), Inches(11.733), Inches(0.4))
 tf5 = cap5.text_frame
-tf5.margin_top = tf5.margin_bottom = tf5.margin_left = tf5.margin_right = 0
+# = tf5.margin_bottom = tf5.margin_left = tf5.margin_right = 0
 p = tf5.paragraphs[0]
-p.text = "Minh chứng đối chứng: Trích xuất 4 tài khoản CSDL khi inject ' OR '1'='1' -- (Trái) vs Chặn đứng an toàn với EF Core (Phải)"
+p.text = "Minh chứng đối chứng: Kiểm tra gói tin mạng (Network Fetch/XHR): Payload gửi lên và JSON trích xuất CSDL ' OR '1'='1' -- (Trái) vs Chặn đứng an toàn với EF Core (Phải)"
 p.font.name = "Arial"
 p.font.size = Pt(11)
 p.font.bold = True
@@ -453,16 +453,16 @@ add_p(tf, "3. Payload 3 (Thay Đổi Toàn Bộ Cấu Trúc Trang Web):\n   <scr
 
 # Slide 11: Minh chứng Web UI XSS (Nhúng ảnh thật - CĂN CHUẨN KHÔNG ĐÈ)
 s11 = prs.slides.add_slide(blank_layout)
-add_header(s11, "2.4. Stored XSS: Minh Chứng Thực Nghiệm Trực Quan Trên Web UI", "CHỦ ĐỀ 2 • NGUYỄN THANH BÌNH (23A1001D0041)")
-p_xss = "/media/hocjsoo/New Volume/OWASP_Demo/screenshots/final_xss_proof.png"
+add_header(s11, "2.4. Stored XSS: Minh Chứng Kiểm Thử Qua Chrome DevTools (Application & Console)", "CHỦ ĐỀ 2 • NGUYỄN THANH BÌNH (23A1001D0041)")
+p_xss = "/media/hocjsoo/New Volume/OWASP_Demo/screenshots/02_xss_devtools_proof.png"
 if os.path.exists(p_xss):
-    s11.shapes.add_picture(p_xss, Inches(2.86), Inches(1.35), width=Inches(7.6))
+    s11.shapes.add_picture(p_xss, Inches(2.06), Inches(1.35), width=Inches(9.2))
 
 cap11 = s11.shapes.add_textbox(Inches(0.8), Inches(6.58), Inches(11.733), Inches(0.4))
 tf11 = cap11.text_frame
 tf11.margin_top = tf11.margin_bottom = tf11.margin_left = tf11.margin_right = 0
 p = tf11.paragraphs[0]
-p.text = "Minh chứng đối chứng: Đoạn script độc hại lưu trữ trong CSDL (Trái) vs Cơ chế tự động mã hóa HTML của Razor View (Phải)"
+p.text = "Minh chứng đối chứng: Soi Cookie lưu trữ (HttpOnly = false) & Lệnh JavaScript document.cookie đọc trộm Session Token (Trái) vs Cơ chế tự động mã hóa HTML của Razor View (Phải)"
 p.font.name = "Arial"
 p.font.size = Pt(11)
 p.font.bold = True
@@ -573,16 +573,16 @@ add_p(tf, "Hậu quả thực tế: Yêu cầu giao dịch được thực hiệ
 
 # Slide 16: Minh chứng Web UI CSRF (Nhúng ảnh thật - CĂN CHUẨN KHÔNG ĐÈ)
 s16 = prs.slides.add_slide(blank_layout)
-add_header(s16, "3.3. CSRF Attack: Minh Chứng Thực Nghiệm Trực Quan Trên Web UI", "CHỦ ĐỀ 3 • NGUYỄN MINH CƯỜNG (23A1001D0058)")
-p_csrf = "/media/hocjsoo/New Volume/OWASP_Demo/screenshots/final_csrf_proof.png"
+add_header(s16, "3.3. CSRF Attack: Minh Chứng Kiểm Thử Qua Chrome DevTools (Request Headers)", "CHỦ ĐỀ 3 • NGUYỄN MINH CƯỜNG (23A1001D0058)")
+p_csrf = "/media/hocjsoo/New Volume/OWASP_Demo/screenshots/03_csrf_devtools_proof.png"
 if os.path.exists(p_csrf):
-    s16.shapes.add_picture(p_csrf, Inches(2.76), Inches(1.35), width=Inches(7.8))
+    s16.shapes.add_picture(p_csrf, Inches(2.06), Inches(1.35), width=Inches(9.2))
 
 cap16 = s16.shapes.add_textbox(Inches(0.8), Inches(6.58), Inches(11.733), Inches(0.4))
 tf16 = cap16.text_frame
 tf16.margin_top = tf16.margin_bottom = tf16.margin_left = tf16.margin_right = 0
 p = tf16.paragraphs[0]
-p.text = "Minh chứng đối chứng: Bị rút 20.000.000 VNĐ qua biểu mẫu ẩn của Hacker (Trái) vs Chặn đứng yêu cầu thiếu Token (Phải)"
+p.text = "Minh chứng đối chứng: Soi gói tin HTTP POST gửi ngầm từ Attacker Site: Đính kèm Cookie tự động nhưng thiếu Anti-Forgery Token của Hacker (Trái) vs Chặn đứng yêu cầu thiếu Token (Phải)"
 p.font.name = "Arial"
 p.font.size = Pt(11)
 p.font.bold = True

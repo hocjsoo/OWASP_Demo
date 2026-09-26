@@ -76,6 +76,12 @@ public class CsrfController : Controller
         return View();
     }
 
+    [HttpGet]
+    public IActionResult DevToolsCsrf()
+    {
+        return View();
+    }
+
     [HttpPost]
     public IActionResult ResetWallets()
     {

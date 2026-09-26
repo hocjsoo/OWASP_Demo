@@ -354,5 +354,16 @@
             alert('Lỗi: ' + err);
         }
     }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('demo') === '1') {
+            applyPayload(`' OR '1'='1' --`, 'anything');
+            setTimeout(() => {
+                submitVulnerable(new Event('submit'));
+                submitSecure(new Event('submit'));
+            }, 600);
+        }
+    });
 </script>
 }

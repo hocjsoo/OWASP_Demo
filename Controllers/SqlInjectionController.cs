@@ -21,6 +21,12 @@ public class SqlInjectionController : Controller
         return View();
     }
 
+    [HttpGet]
+    public IActionResult DevToolsNetwork()
+    {
+        return View();
+    }
+
     // 1. VULNERABLE LOGIN (Ghép chuỗi SQL - Dính lỗi nghiêm trọng)
     [HttpPost]
     public IActionResult LoginVulnerable(string username, string password)
