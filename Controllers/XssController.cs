@@ -66,7 +66,7 @@ public class XssController : Controller
 
         var comment = new Comment
         {
-            Author = HtmlEncoder.Default.Encode(author.Trim()),
+            Author = author.Trim(),
             Content = encodedContent, // Lưu nội dung đã được Sanitized / Encoded
             CreatedAt = DateTime.Now,
             IsSecureStored = true
