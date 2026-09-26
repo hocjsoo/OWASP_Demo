@@ -1,0 +1,111 @@
+@{
+    ViewData["Title"] = "Thực Nghiệm CSRF (OWASP A01:2021) - Nguyễn Minh Cường";
+    var victim = ViewBag.Victim as OwaspDemo.Models.UserWallet;
+    var hacker = ViewBag.Hacker as OwaspDemo.Models.UserWallet;
+}
+
+<div class="row mb-4">
+    <div class="col-12 text-center">
+        <span class="badge bg-danger px-3 py-2 fs-6 mb-2">Chủ đề 3 • Nguyễn Minh Cường (23A1001D0058)</span>
+        <h2 class="fw-bold text-dark">THỰC NGHIỆM TẤN CÔNG & PHÒNG THỦ: CSRF</h2>
+        <p class="text-secondary mb-1">
+            Lỗ hổng Cross-Site Request Forgery (Giả mạo yêu cầu từ trang web khác để chuyển tiền ngầm)
+        </p>
+    </div>
+</div>
+
+<!-- THÔNG BÁO GIAO DỊCH -->
+@if (TempData["CsrfVulnMsg"] != null)
+{
+    <div class="alert alert-danger shadow-sm fw-bold">
+        @TempData["CsrfVulnMsg"]
+    </div>
+}
+@if (TempData["CsrfSecMsg"] != null)
+{
+    <div class="alert alert-success shadow-sm fw-bold">
+        @TempData["CsrfSecMsg"]
+    </div>
+}
+
+<!-- TRẠNG THÁI SỐ DƯ TÀI KHOẢN HIỆN TẠI -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card border-primary shadow-sm">
+            <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between">
+                <span>👤 TÀI KHOẢN NẠN NHÂN (ĐÃ ĐĂNG NHẬP)</span>
+                <span>ID: 1</span>
+            </div>
+            <div class="card-body">
+                <h4>@(victim?.OwnerName)</h4>
+                <p class="mb-0 text-muted">Số dư trong ví:</p>
+                <h3 class="text-primary fw-bold">@(victim?.Balance.ToString("N0")) VNĐ</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-dark shadow-sm">
+            <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between">
+                <span>💀 VÍ TIỀN KẺ TẤN CÔNG (HACKER)</span>
+                <span>ID: 2</span>
+            </div>
+            <div class="card-body">
+                <h4>@(hacker?.OwnerName)</h4>
+                <p class="mb-0 text-muted">Số tiền đã chiếm đoạt:</p>
+                <h3 class="text-danger fw-bold">@(hacker?.Balance.ToString("N0")) VNĐ</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2 CỘT FORM GIAO DỊCH NỘI BỘ VÀ TRANG GIẢ MẠO CỦA HACKER -->
+<div class="row g-4 mb-4">
+    <!-- CỘT 1: FORM GIAO DỊCH BỊ LỖI (KHÔNG CÓ CSRF TOKEN) -->
+    <div class="col-lg-6">
+        <div class="card border-danger shadow-sm h-100">
+            <div class="card-header bg-danger text-white py-3">
+                <h5 class="card-title mb-0 fw-bold">❌ 1. CHỨC NĂNG BỊ LỖI (Thiếu Token Phòng Thủ)</h5>
+                <small class="opacity-75">Action TransferVulnerable không có thuộc tính [ValidateAntiForgeryToken]</small>
+            </div>
+            <div class="card-body">
+                <p class="small text-secondary">
+                    Khi nạn nhân đang đăng nhập hệ thống này, nếu vô tình click vào một link lạ của hacker (ở tab bên cạnh), hacker có thể tự động gửi form POST chuyển tiền ngầm mà nạn nhân không hề hay biết!
+                </p>
+                
+                <a href="/Csrf/AttackerSite" target="_blank" class="btn btn-outline-danger w-100 py-3 fw-bold mb-3">
+                    🔥 MỞ TRANG WEB BẪY CỦA HACKER (Attacker Site)<br>
+                    <small class="fw-normal">Mở tab mới giả lập nạn nhân bị lừa bấm vào trang nhận quà trúng thưởng</small>
+                </a>
+
+                <form asp-action="ResetWallets" method="post">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm w-100">🔄 Khôi Phục Số Dư Ban Đầu (50 Triệu)</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- CỘT 2: FORM GIAO DỊCH AN TOÀN (CÓ TOKEN BẢO VỆ) -->
+    <div class="col-lg-6">
+        <div class="card border-success shadow-sm h-100">
+            <div class="card-header bg-success text-white py-3">
+                <h5 class="card-title mb-0 fw-bold">✅ 2. CHỨC NĂNG ĐÃ PHÒNG THỦ (Có AntiForgeryToken)</h5>
+                <small class="opacity-75">Sử dụng @@Html.AntiForgeryToken() và [ValidateAntiForgeryToken]</small>
+            </div>
+            <div class="card-body">
+                <p class="small text-secondary">
+                    Form này tự sinh ra một mã token bí mật duy nhất cho mỗi phiên duyệt. Khi kẻ tấn công gửi request từ một tên miền khác, chúng không thể lấy được mã token này, request bị máy chủ từ chối ngay lập tức (Lỗi 400 Bad Request).
+                </p>
+                <form asp-action="TransferSecure" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Chuyển tiền chính chủ (An toàn):</label>
+                        <input type="number" name="amount" class="form-control border-success" value="5000000" />
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold py-2">
+                        🛡️ Thực Hiện Giao Dịch Hợp Lệ Có Token
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

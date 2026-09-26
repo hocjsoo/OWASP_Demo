@@ -1,0 +1,156 @@
+@model List<OwaspDemo.Models.Comment>
+@{
+    ViewData["Title"] = "Thực Nghiệm Stored XSS (OWASP A03:2021) - Nguyễn Thanh Bình";
+}
+
+<div class="row mb-4">
+    <div class="col-12 text-center">
+        <span class="badge bg-danger px-3 py-2 fs-6 mb-2">Chủ đề 2 • Nguyễn Thanh Bình (23A1001D0041)</span>
+        <h2 class="fw-bold text-dark">THỰC NGHIỆM TẤN CÔNG & PHÒNG THỦ: STORED XSS</h2>
+        <p class="text-secondary mb-1">
+            Lỗ hổng Cross-Site Scripting lưu trữ trong chức năng Nhận xét / Đánh giá Chuyên gia
+        </p>
+    </div>
+</div>
+
+<!-- PAYLOAD TOOLBAR CHO XSS -->
+<div class="card shadow-sm border-0 mb-4 bg-white">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <span class="fw-bold">⚡ Nạp Kịch Bản Payload Tấn Công XSS (Nhấn 1 click để điền)</span>
+        <form asp-action="ClearComments" method="post" class="d-inline">
+            <button type="submit" class="btn btn-outline-warning btn-sm">🔄 Xóa Bình Luận Về Mặc Định</button>
+        </form>
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-danger btn-sm" onclick="applyXssPayload(`Hacker_XSS`, `<script>alert('🚨 BỊ HACK XSS! Đã đánh cắp Session Cookie: ' + document.cookie);</script>`)">
+                🔥 Payload 1: Đánh Cắp Cookie Session (<code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code>)
+            </button>
+            <button class="btn btn-outline-danger btn-sm" onclick="applyXssPayload(`Attacker`, `<img src=x onerror=alert('🚨 XSS kích hoạt qua thẻ IMG onerror!')>`)">
+                🔥 Payload 2: Bypass Filter qua Thẻ Ảnh (<code>&lt;img src=x onerror=...&gt;</code>)
+            </button>
+            <button class="btn btn-outline-danger btn-sm" onclick="applyXssPayload(`Hacker_Redirect`, `<script>document.body.innerHTML='<h1 style=color:red;text-align:center;margin-top:20%>WEB ĐÃ BỊ CHIẾM QUYỀN ĐIỀU KHIỂN!</h1>';</script>`)">
+                🔥 Payload 3: Thay Đổi Toàn Bộ Nội Dung Web (DOM Defacement)
+            </button>
+            <button class="btn btn-outline-success btn-sm" onclick="applyXssPayload(`Nguyen Van A`, `Tôi rất hài lòng với chuyên gia tư vấn. Dịch vụ tuyệt vời!`)">
+                🔑 Bình Luận Bình Thường (Hợp Lệ)
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 2 CỘT THỰC NGHIỆM XSS -->
+<div class="row g-4">
+    <!-- CỘT 1: NHÁNH BỊ LỖI (VULNERABLE) -->
+    <div class="col-lg-6">
+        <div class="card border-danger shadow-sm h-100">
+            <div class="card-header bg-danger text-white py-3">
+                <h5 class="card-title mb-0 fw-bold">❌ 1. NHÁNH BỊ LỖI (Không Lọc Dữ Liệu - Dùng @@Html.Raw)</h5>
+                <small class="opacity-75">Server lưu nguyên văn & View render bằng @@Html.Raw(content)</small>
+            </div>
+            <div class="card-body">
+                <form asp-action="AddVulnerable" method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên người nhận xét:</label>
+                        <input type="text" name="author" id="xssAuthorVuln" class="form-control border-danger font-monospace" placeholder="Nhập tên..." required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nội dung đánh giá:</label>
+                        <textarea name="content" id="xssContentVuln" class="form-control border-danger font-monospace" rows="3" placeholder="Nhập nội dung hoặc chọn payload ở trên..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100 fw-bold py-2">
+                        🚀 Đăng Đánh Giá (Vulnerable Action)
+                    </button>
+                </form>
+
+                <div class="alert alert-danger mt-3 small">
+                    <strong>Hậu quả:</strong> Khi người dùng khác mở trang này, trình duyệt sẽ tự động thực thi đoạn mã JavaScript độc hại của hacker ngay lập tức!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CỘT 2: NHÁNH AN TOÀN (SECURE) -->
+    <div class="col-lg-6">
+        <div class="card border-success shadow-sm h-100">
+            <div class="card-header bg-success text-white py-3">
+                <h5 class="card-title mb-0 fw-bold">✅ 2. NHÁNH AN TOÀN (Tự Động HTML Encoding)</h5>
+                <small class="opacity-75">Sử dụng Razor Encoding mặc định @@comment.Content hoặc HtmlEncoder</small>
+            </div>
+            <div class="card-body">
+                <form asp-action="AddSecure" method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên người nhận xét:</label>
+                        <input type="text" name="author" id="xssAuthorSec" class="form-control border-success font-monospace" placeholder="Nhập tên..." required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nội dung đánh giá:</label>
+                        <textarea name="content" id="xssContentSec" class="form-control border-success font-monospace" rows="3" placeholder="Nhập nội dung hoặc chọn payload ở trên..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold py-2">
+                        🛡️ Đăng Đánh Giá (Secure Action)
+                    </button>
+                </form>
+
+                <div class="alert alert-success mt-3 small">
+                    <strong>Cơ chế bảo vệ:</strong> Các ký tự nguy hiểm <code>&lt;</code>, <code>&gt;</code> được mã hóa thành <code>&amp;lt;</code>, <code>&amp;gt;</code>. Trình duyệt chỉ hiển thị như văn bản thuần, không chạy mã script.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DANH SÁCH BÌNH LUẬN HIỂN THỊ THỰC TẾ TRÊN CƠ SỞ DỮ LIỆU -->
+<div class="card shadow-sm border-0 mt-4 mb-4">
+    <div class="card-header bg-primary text-white fw-bold">
+        💬 Danh Sách Đánh Giá Đã Lưu Trong CSDL (Nơi Kích Hoạt Lỗ Hổng Khi Trang Được Tải)
+    </div>
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            <div class="list-group">
+                @foreach (var c in Model)
+                {
+                    <div class="list-group-item list-group-item-action mb-2 rounded border @(c.IsSecureStored ? "border-success" : "border-danger")">
+                        <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                            <h6 class="mb-0 fw-bold">
+                                👤 @c.Author 
+                                <span class="badge @(c.IsSecureStored ? "bg-success" : "bg-danger") ms-2">
+                                    @(c.IsSecureStored ? "Đã Phòng Thủ (Encoded)" : "Dính Lỗi (Raw Script)")
+                                </span>
+                            </h6>
+                            <small class="text-muted">@c.CreatedAt.ToString("HH:mm:ss dd/MM/yyyy")</small>
+                        </div>
+                        <div class="p-2 bg-light rounded mt-1">
+                            @if (c.IsSecureStored)
+                            {
+                                <!-- Nhánh an toàn: Razor tự động Encode -->
+                                <p class="mb-0 text-dark">@c.Content</p>
+                            }
+                            else
+                            {
+                                <!-- Nhánh bị lỗi: Dùng Html.Raw cho phép trình duyệt thực thi mã độc -->
+                                <div class="mb-0">
+                                    @Html.Raw(c.Content)
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted text-center my-3">Chưa có bình luận nào.</p>
+        }
+    </div>
+</div>
+
+<script>
+    function applyXssPayload(author, payload) {
+        document.getElementById('xssAuthorVuln').value = author;
+        document.getElementById('xssContentVuln').value = payload;
+        document.getElementById('xssAuthorSec').value = author;
+        document.getElementById('xssContentSec').value = payload;
+    }
+</script>

